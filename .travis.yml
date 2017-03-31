@@ -1,7 +1,5 @@
 dist: trusty
 language: rust
-services: docker
-sudo: required
 
 env:
   global:
