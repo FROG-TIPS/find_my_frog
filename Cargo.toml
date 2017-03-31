@@ -1,0 +1,12 @@
+[package]
+name = "find_my_frog"
+version = "0.1.0"
+authors = ["Perl I. Weird <perlisweird@gmail.com>"]
+
+[dependencies]
+irc = "0.11.6"
+getopts = "0.2"
+reqwest = "0.5.0"
+rustc-serialize = "0.3"
+log = "0.3.6"
+time = "0.1"
