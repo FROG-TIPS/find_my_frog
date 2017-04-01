@@ -4,7 +4,7 @@ version = "0.1.2"
 authors = ["Perl I. Weird <perlisweird@gmail.com>"]
 
 [dependencies]
-irc = "0.11.6"
+irc = { git = "https://github.com/FROG-TIPS/irc", branch = "master" }
 getopts = "0.2"
 hyper = "0.7"
 rustc-serialize = "0.3"
