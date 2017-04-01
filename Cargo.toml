@@ -1,6 +1,6 @@
 [package]
 name = "find_my_frog"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Perl I. Weird <perlisweird@gmail.com>"]
 
 [dependencies]
