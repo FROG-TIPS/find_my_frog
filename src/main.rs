@@ -2,7 +2,7 @@
 
 extern crate irc;
 extern crate getopts;
-extern crate reqwest;
+extern crate hyper;
 extern crate time;
 extern crate rustc_serialize;
 
@@ -17,13 +17,13 @@ mod frog_log;
 
 mod search {
     use rustc_serialize::json;
-    use reqwest;
+    use hyper;
     use std::io::Read;
     use std::io;
 
     pub struct Searcher {
         api_key: String,
-        client: reqwest::Client,
+        client: hyper::Client,
     }
 
     type TipNum = u64;
@@ -50,15 +50,15 @@ mod search {
 
     #[derive(Debug)]
     pub enum TipError {
-        StatusNotOk(reqwest::StatusCode),
-        Network(reqwest::Error),
+        StatusNotOk(hyper::status::StatusCode),
+        Network(hyper::Error),
         Decoding(json::DecoderError),
         Search(json::EncoderError),
         Io(io::Error),
     }
 
-    impl From<reqwest::Error> for TipError {
-        fn from(err: reqwest::Error) -> TipError {
+    impl From<hyper::Error> for TipError {
+        fn from(err: hyper::Error) -> TipError {
             TipError::Network(err)
         }
     }
@@ -83,7 +83,7 @@ mod search {
 
     impl Searcher {
         pub fn new(api_key: String) -> Searcher {
-            let client = reqwest::Client::new().unwrap();
+            let client = hyper::Client::new();
             Searcher {
                 api_key: api_key,
                 client: client,
@@ -105,16 +105,13 @@ mod search {
 
             let mut resp = try!(
                 self.client.post("https://frog.tips/api/2/tips/search")
-                           .body(body)
-                           .header(reqwest::header::Authorization(self.api_key.clone()))
-                           .header(reqwest::header::Connection::close())
+                           .body(&body)
+                           .header(hyper::header::Authorization(self.api_key.clone()))
+                           .header(hyper::header::Connection::close())
                            .send());
 
-            {
-                let status = resp.status();
-                if status != &reqwest::StatusCode::Ok {
-                    return Err(TipError::StatusNotOk(*status));
-                }
+            if resp.status != hyper::Ok {
+                return Err(TipError::StatusNotOk(resp.status));
             }
 
             let mut body = String::new();
