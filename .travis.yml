@@ -42,6 +42,7 @@ deploy:
   provider: releases
   api_key:
     secure: VFyzY1QnqI1KL6gR+meBurHW42yfly1CF5werWtNtH7RhbAZiG/RbDMhDgMwL7KbvHuwONL6KFDrydN0fhkZWJ42Eqavec2pG+WnRE7KQmiMy85MYNTq73XEYUGhmvqB6e4kbDEsih27YeEdIsjyEjXB/ZPHGWQr4PbB+4PMUAPpWlbRmbt0iVX7ghbZ7vHX+S5LDgkgVjRJ1oioZsq8gX849/NxNPXWssXqhihMPNA43tB8Z9vqTPXuNVlsYDtxoUn3B3qwOWzTDWe/8rejJ71C7cgMOPknscqrgX1A9Wnx2NAFrJQ3XT95FdSLAzXCxZBhl++dI4VxPsH3/7CryWQBgM3mwQ2+rjSVzlp2IV1WKdSGsbUg9BOo0fvQggchn+i9x4wlDEdGYg7rCVFx/+/5+mTLy+xiABVjfYa8n9aD2nOg/EMc/mxAkF7F+8nWRlPUqJHScm6/a/oER65PitnjF4Z4nv2m8++Z3sYSsHw6tU4u89gDe8ISvTmynCxQ06sp8aOVfOOco8R1aJDa0hNRwb4EuE05CFZ4xxqmkkGDKv333dPn/fwhbgpGLOpdc/mCP5XJot+m2YFQMjNUGM9S8XUGaoD8N0LuRUAUn5HbDVG5fX2WnDn7fbetMcoEwzhEG2QPOSekB21UXZK1coX+fABq/3uixZXDpAFmO+o=
+
   file_glob: true
   file: ${CRATE_NAME}-${TRAVIS_TAG}-${TARGET}.*
   # don't delete the artifacts from previous phases

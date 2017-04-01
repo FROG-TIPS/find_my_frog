@@ -103,8 +103,6 @@ mod search {
             };
             let body = try!(json::encode(&query));
 
-            info!("{:?}", body);
-
             let mut resp = try!(
                 self.client.post("https://frog.tips/api/2/tips/search")
                            .body(body)
@@ -165,6 +163,9 @@ fn main() {
     for message in server.iter() {
         // Let's be real careful in here and not fucking panic, alrights boys?
         if let Ok(message) = message {
+            // LOG YOUR FROG
+            info!("{:?}", message);
+
             if let Command::PRIVMSG(ref target, ref msg) = message.command {
                 if let Some(source_nickname) = message.source_nickname() {
                     let current_nickname_with_colon = format!("{}:", server.current_nickname());
