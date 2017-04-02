@@ -152,7 +152,9 @@ impl fmt::Display for Reply {
                            .map(|t| t.number.to_string())
                            .collect::<Vec<String>>()
                            .join(", ");
-                writeln!(f, "*ALSO* {}", rest)
+                if rest.len() > 0 {
+                    writeln!(f, "*ALSO* {}", rest)
+                }
             },
             Reply::NoTips => writeln!(f, "NO TIPS FOUND <SFX: SAD TROMBONE>"),
             Reply::Error(ref why) => writeln!(f, "{:?}", why),
