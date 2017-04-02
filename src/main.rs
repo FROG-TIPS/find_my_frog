@@ -9,10 +9,6 @@ extern crate rustc_serialize;
 #[macro_use]
 extern crate log;
 
-use irc::client::prelude::*;
-use getopts::Options;
-use std::env;
-
 mod frog_log;
 
 mod search {
@@ -31,9 +27,9 @@ mod search {
     #[allow(dead_code)]
     #[derive(RustcDecodable)]
     pub struct Tip {
-        approved: bool,
-        moderated: bool,
-        tweeted: Option<u64>,
+        pub approved: bool,
+        pub moderated: bool,
+        pub tweeted: Option<u64>,
         pub number: TipNum,
         pub tip: String,
     }
@@ -122,6 +118,48 @@ mod search {
     }
 }
 
+use irc::client::prelude::*;
+use getopts::Options;
+use std::env;
+use std::fmt;
+
+static NUM_FULL_TIPS_TO_SHOW: usize = 3;
+static MAX_BRIEF_TIPS_TO_SHOW: usize = 100;
+
+enum Reply {
+    Tips(Vec<search::Tip>),
+    NoTips,
+    Error(search::TipError),
+}
+
+impl fmt::Display for Reply {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Reply::Tips(ref tips) => {
+                for tip in tips.iter().take(NUM_FULL_TIPS_TO_SHOW) {
+                    writeln!(f,
+                           "{number} - {tip} ({approved}; {moderated}; {tweeted})",
+                           tip=tip.tip,
+                           number=tip.number,
+                           approved=if tip.approved { "approved" } else { "not approved"},
+                           moderated=if tip.moderated { "moderated" } else { "not moderated"},
+                           tweeted=if let Some(_) = tip.tweeted { "tweeted" } else { "not tweeted" });
+                }
+
+                let rest = tips.iter()
+                           .skip(NUM_FULL_TIPS_TO_SHOW)
+                           .take(MAX_BRIEF_TIPS_TO_SHOW)
+                           .map(|t| t.number.to_string())
+                           .collect::<Vec<String>>()
+                           .join(", ");
+                writeln!(f, "*ALSO* {}", rest)
+            },
+            Reply::NoTips => writeln!(f, "NO TIPS FOUND <SFX: SAD TROMBONE>"),
+            Reply::Error(ref why) => writeln!(f, "{:?}", why),
+        }
+    }
+}
+
 fn main() {
     let matches = {
         let args: Vec<String> = env::args().collect();
@@ -175,30 +213,13 @@ fn main() {
                                      .collect::<Vec<&str>>()
                                      .join("");
 
-                    match searcher.search(message) {
-                        Ok(tips) => {
-                            if tips.is_empty() {
-                                server.send_privmsg(target, "NO TIPS FOUND <SFX: SAD TROMBONE>");
-                                continue;
-                            }
+                    let reply = match searcher.search(message) {
+                        Ok(tips) => if tips.is_empty() { Reply::NoTips } else { Reply::Tips(tips) },
+                        Err(why) => Reply::Error(why),
+                    };
 
-                            for tip in tips.iter().take(3) {
-                                server.send_privmsg(target, format!("{}: {} - {}", source_nickname, tip.number, tip.tip).as_str());
-                            }
-
-                            let rest = tips.iter()
-                                           .skip(3)
-                                           .take(100)
-                                           .map(|t| t.number.to_string())
-                                           .collect::<Vec<String>>()
-                                           .join(" ");
-                            if !rest.is_empty() {
-                                server.send_privmsg(target, format!("{}: also {}", source_nickname, rest).as_str());
-                            }
-                        },
-                        Err(why) => {
-                            server.send_privmsg(target, format!("{:?}", why).as_str());
-                        }
+                    for line in format!("{}", reply).lines() {
+                        server.send_privmsg(target, format!("{}: {}", source_nickname, line).as_str());
                     }
                 }
             }
