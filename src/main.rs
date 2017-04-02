@@ -154,6 +154,8 @@ impl fmt::Display for Reply {
                            .join(", ");
                 if rest.len() > 0 {
                     writeln!(f, "*ALSO* {}", rest)
+                } else {
+                    Ok(())
                 }
             },
             Reply::NoTips => writeln!(f, "NO TIPS FOUND <SFX: SAD TROMBONE>"),
