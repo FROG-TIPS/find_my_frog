@@ -1,5 +1,7 @@
 # FIND MY FROG
 
+> FROG Systems develops only the latest and greatest tools for FROG. This code is no longer used internally but has been kept public as a reminder - and warning - for humanity.
+
 ```
            .--._.--.
           ( O     O )
